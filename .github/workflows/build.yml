@@ -11,7 +11,10 @@ permissions:
 
 jobs:
   build:
-    runs-on: windows-latest
+    # Pin the runner because this project explicitly uses the Visual Studio 2022
+    # CMake generator. A future "windows-latest" image may not expose that VS
+    # instance under the same generator name.
+    runs-on: windows-2022
     steps:
       - name: Check out source
         uses: actions/checkout@v4
