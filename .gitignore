@@ -1,0 +1,42 @@
+# Build output
+build/
+build-*/
+deploy/
+deploy-*/
+dist/
+release/
+bin/
+obj/
+
+# IDE / CMake
+.vs/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+*.sln
+*.vcxproj
+*.vcxproj.*
+*.user
+
+# Compiled files
+*.dll
+*.exe
+*.pdb
+*.obj
+*.lib
+*.exp
+
+# Runtime / diagnostics
+*.log
+*.dmp
+Outlast2.exe
+OLGame/
+Engine/
+UDKGame/
+
+# Archives / local backups
+*.zip
+*.rar
+*.7z
+_*backup*/
+release-assets/

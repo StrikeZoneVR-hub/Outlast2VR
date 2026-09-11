@@ -1,0 +1,61 @@
+name: Bug report
+description: Report a repeatable VR, input, interaction, or launcher problem.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not upload Outlast 2 game files, extracted assets, saves, or the game executable.
+  - type: input
+    id: build
+    attributes:
+      label: Mod build
+      placeholder: Beta 1 / PF17
+    validations:
+      required: true
+  - type: input
+    id: headset
+    attributes:
+      label: Headset and connection
+      placeholder: Quest 3 via Virtual Desktop
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: OpenXR runtime
+      placeholder: VDXR, Meta Quest Link, or SteamVR
+    validations:
+      required: true
+  - type: input
+    id: gpu
+    attributes:
+      label: GPU and driver
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Exact reproduction steps
+      placeholder: Include chapter/location, action, and whether a continued save was used.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Drag outlast2_vr_p34.log here. Review it for personal information first.
+    validations:
+      required: true
