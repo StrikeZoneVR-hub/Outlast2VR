@@ -29,7 +29,7 @@ if (-not $BackupRoot) {
     $BackupRoot = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'Outlast2VR-install-backups'
 }
 $backupRoot = [IO.Path]::GetFullPath($BackupRoot)
-$backup = Join-Path $backupRoot ('before-beta1-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+$backup = Join-Path $backupRoot ('before-beta1.1-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
 New-Item -ItemType Directory -Path $backup -Force | Out-Null
 
 foreach ($file in $files) {
@@ -43,6 +43,6 @@ foreach ($file in $files) {
     if ($sourceHash -ne $targetHash) { throw "Installed hash did not match: $file" }
 }
 
-Write-Output "Outlast 2 VR Beta 1 installed to: $gamePath"
+Write-Output "Outlast 2 VR Beta 1.1 RC1 installed to: $gamePath"
 Write-Output "Previous mod files backed up to: $backup"
 Write-Output 'Launch Outlast2VR.exe and choose PLAY VR.'

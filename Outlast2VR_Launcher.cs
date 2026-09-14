@@ -36,7 +36,7 @@ enum LauncherPage { Launch, Controls, Diagnostics, Options }
 public class LauncherForm : Form
 {
     const string MusicAlias = "Outlast2VRMenuMusic";
-    const string BuildName = "BETA 1  •  PF17 NATIVE VR VIEW";
+    const string BuildName = "BETA 1.1 RC1  •  PF18 COMPATIBILITY";
     readonly string gameDir, exePath, preferencesPath;
     readonly bool previewMode;
     readonly Random random = new Random();
@@ -45,7 +45,7 @@ public class LauncherForm : Form
     readonly Button[] navButtons = new Button[4];
     readonly Panel[] pages = new Panel[4];
     Image background;
-    RadioButton defaultOpenXR, steamOpenXR, colorSrgb, colorLegacy, graphicsSafe, graphicsKeep;
+    RadioButton defaultOpenXR, steamOpenXR, colorSrgb, colorLegacy, graphicsSafe, graphicsKeep, stereoCompat, stereoDepth;
     CheckBox reduceFlashes;
     Label diagnosticsText, mainRuntime, statusLine;
     Button play, musicButton;
@@ -135,7 +135,7 @@ public class LauncherForm : Form
         Panel rule=new Panel(); rule.BackColor=Color.FromArgb(110,47,31); rule.Location=new Point(24,136); rule.Size=new Size(350,1); page.Controls.Add(rule);
         mainRuntime=MakeLabel("OPENXR  //  "+FriendlyRuntime(GetDefaultRuntime()),10f,FontStyle.Bold,Color.FromArgb(153,226,174),ContentAlignment.MiddleLeft);
         mainRuntime.Location=new Point(25,146); mainRuntime.Size=new Size(350,24); page.Controls.Add(mainRuntime);
-        statusLine=MakeLabel("BETA 1 GAMEPLAY CORE",9f,FontStyle.Bold,Color.FromArgb(255,188,77),ContentAlignment.MiddleLeft);
+        statusLine=MakeLabel("BETA 1.1 COMPATIBILITY CORE",9f,FontStyle.Bold,Color.FromArgb(255,188,77),ContentAlignment.MiddleLeft);
         statusLine.Location=new Point(25,174); statusLine.Size=new Size(350,22); page.Controls.Add(statusLine);
         play=MakeButton("PLAY VR",new Point(24,207),new Size(350,65),18f); play.FlatAppearance.BorderSize=2;
         play.MouseEnter+=delegate { play.BackColor=Color.FromArgb(32,92,53); play.FlatAppearance.BorderColor=Color.FromArgb(132,255,168); Invalidate(); };
@@ -196,9 +196,13 @@ public class LauncherForm : Form
         reduceFlashes=new CheckBox(); reduceFlashes.Text="Reduce flashes and disable hidden horror effects"; reduceFlashes.Location=new Point(44,481); reduceFlashes.Size=new Size(390,30);
         reduceFlashes.ForeColor=Color.White; reduceFlashes.BackColor=page.BackColor; reduceFlashes.CheckedChanged+=delegate { SavePreferences(); Invalidate(); }; page.Controls.Add(reduceFlashes);
         Panel divide=new Panel(); divide.BackColor=Color.FromArgb(80,62,41); divide.Location=new Point(454,110); divide.Size=new Size(1,416); page.Controls.Add(divide);
-        Label recenter=MakeLabel("RECENTER FOR COMFORT",12f,FontStyle.Bold,Color.FromArgb(255,188,77),ContentAlignment.MiddleLeft); recenter.Location=new Point(490,113); recenter.Size=new Size(365,30); page.Controls.Add(recenter);
-        Label instructions=MakeLabel("1. Sit or stand in your intended play position.\n\n2. Face straight ahead before launching.\n\n3. Hold both stick clicks (L3 + R3) in gameplay to open the VR settings/recenter controls.\n\nVirtual Desktop: use VDXR with color vibrance and gamma at neutral while comparing visuals.\n\nThe recommended settings preserve the Beta 1 gameplay renderer.",10f,FontStyle.Regular,Color.FromArgb(210,218,208),ContentAlignment.TopLeft);
-        instructions.Location=new Point(490,156); instructions.Size=new Size(360,315); page.Controls.Add(instructions);
+        Label renderer=MakeLabel("GAMEPLAY RENDERER",12f,FontStyle.Bold,Color.FromArgb(255,188,77),ContentAlignment.MiddleLeft); renderer.Location=new Point(490,113); renderer.Size=new Size(365,30); page.Controls.Add(renderer);
+        Panel rendererGroup=MakeGroup(new Point(486,140),new Size(380,70));
+        stereoCompat=MakeRadio("Compatibility / performance — recommended",new Point(4,5),new Size(370,28));
+        stereoDepth=MakeRadio("Experimental depth stereo — higher GPU cost",new Point(4,37),new Size(370,28)); rendererGroup.Controls.Add(stereoCompat); rendererGroup.Controls.Add(stereoDepth); page.Controls.Add(rendererGroup);
+        Label recenter=MakeLabel("RECENTER FOR COMFORT",12f,FontStyle.Bold,Color.FromArgb(255,188,77),ContentAlignment.MiddleLeft); recenter.Location=new Point(490,228); recenter.Size=new Size(365,30); page.Controls.Add(recenter);
+        Label instructions=MakeLabel("1. Sit or stand in your intended play position.\n\n2. Face straight ahead before launching.\n\n3. Hold both stick clicks (L3 + R3) in gameplay to open VR settings/recenter.\n\nVirtual Desktop: use VDXR and leave color vibrance and gamma neutral while comparing visuals.\n\nCompatibility mode is sharper, faster and most reliable. Depth stereo is experimental.",9.3f,FontStyle.Regular,Color.FromArgb(210,218,208),ContentAlignment.TopLeft);
+        instructions.Location=new Point(490,267); instructions.Size=new Size(360,205); page.Controls.Add(instructions);
         Button save=MakeButton("SAVE OPTIONS",new Point(490,486),new Size(360,54),11f); save.Click+=delegate { SavePreferences(); statusLine.Text="OPTIONS SAVED"; ShowPage(LauncherPage.Launch); }; page.Controls.Add(save);
         ApplyPreferencesToControls();
     }
@@ -329,10 +333,11 @@ public class LauncherForm : Form
             else if(psi.EnvironmentVariables.ContainsKey("XR_RUNTIME_JSON"))psi.EnvironmentVariables.Remove("XR_RUNTIME_JSON");
             if(Process.GetProcessesByName("Outlast2").Length!=0)throw new InvalidOperationException("Close Outlast 2 before starting a new VR session.");
             WritePrivateProfileString("VR","GameplaySrgb",colorSrgb.Checked?"1":"0",Path.Combine(gameDir,"outlast2_vr_p35.ini"));
+            WritePrivateProfileString("VR","SameFrameStereo",stereoDepth.Checked?"2":"1",Path.Combine(gameDir,"outlast2_vr_p32.ini"));
             string settings=VrSettings.PathForUser(),backup="not changed (current game graphics selected)",hudSettings=VrSettings.HudPathForSettings(settings),hudBackup="not changed";
             if(graphicsSafe.Checked){backup=VrSettings.Apply(settings)??"unchanged; already VR-safe";hudBackup=VrSettings.ApplyHud(hudSettings)??"unchanged; VR interaction settings already applied";}
             psi.EnvironmentVariables["OUTLAST2VR_SETTINGS_PATH"]=settings;
-            File.AppendAllText(Path.Combine(gameDir,"Outlast2VR_launcher.log"),DateTime.UtcNow.ToString("o")+" "+BuildName+"\r\nRuntime: "+(steamOpenXR.Checked?"SteamVR":FriendlyRuntime(GetDefaultRuntime()))+"\r\nColor: "+(colorSrgb.Checked?"sRGB":"legacy UNORM")+"\r\nGraphics: "+(graphicsSafe.Checked?"VR-safe":"keep current")+"\r\nSettings: "+settings+"\r\nBackup: "+backup+"\r\nHUD settings: "+hudSettings+"\r\nGameplay/HUD backup: "+hudBackup+"\r\n");
+            File.AppendAllText(Path.Combine(gameDir,"Outlast2VR_launcher.log"),DateTime.UtcNow.ToString("o")+" "+BuildName+"\r\nRuntime: "+(steamOpenXR.Checked?"SteamVR":FriendlyRuntime(GetDefaultRuntime()))+"\r\nRenderer: "+(stereoDepth.Checked?"experimental depth stereo":"compatibility / performance")+"\r\nColor: "+(colorSrgb.Checked?"sRGB":"legacy UNORM")+"\r\nGraphics: "+(graphicsSafe.Checked?"VR-safe":"keep current")+"\r\nSettings: "+settings+"\r\nBackup: "+backup+"\r\nHUD settings: "+hudSettings+"\r\nGameplay/HUD backup: "+hudBackup+"\r\n");
             Process.Start(psi);Close();
         }
         catch(Exception ex){play.Enabled=true;MessageBox.Show(ex.Message,"Outlast 2 VR - Launch failed",MessageBoxButtons.OK,MessageBoxIcon.Error);StartMusic();}
@@ -341,17 +346,17 @@ public class LauncherForm : Form
     void RefreshDiagnostics()
     {
         if(diagnosticsText==null)return;string runtime=GetDefaultRuntime();bool game=File.Exists(exePath),mod=File.Exists(Path.Combine(gameDir,"dinput8.dll")),loader=File.Exists(Path.Combine(gameDir,"openxr_loader.dll")),ini=File.Exists(Path.Combine(gameDir,"outlast2_vr_p35.ini"));
-        StringBuilder t=new StringBuilder();t.AppendLine(Status(game,"GAME",game?"Outlast2.exe found":"Outlast2.exe missing"));t.AppendLine(Status(mod,"VR MOD",mod?"dinput8.dll found":"dinput8.dll missing"));t.AppendLine(Status(loader,"OPENXR",loader?"loader found":"openxr_loader.dll missing"));t.AppendLine(Status(ini,"CONFIG",ini?"Beta 1 PF17 configuration found":"outlast2_vr_p35.ini missing"));t.AppendLine();t.AppendLine(Status(!String.IsNullOrEmpty(runtime),"RUNTIME",FriendlyRuntime(runtime)));t.AppendLine("  ACTIVE JSON    "+(String.IsNullOrEmpty(runtime)?"Not configured":runtime));t.AppendLine("  SERVICE        "+RuntimeServiceStatus(runtime));t.AppendLine("  HEADSET        Verified when game OpenXR session starts");t.AppendLine("  CONTROLLERS    Verified when game action sets attach");t.AppendLine();t.AppendLine("  ACTIVE BUILD   "+BuildName);t.AppendLine("  GAMEPLAY CORE  PF17 native view + progression; hybrid tracked arms");diagnosticsText.Text=t.ToString();if(mainRuntime!=null)mainRuntime.Text="OPENXR  //  "+FriendlyRuntime(runtime);
+        StringBuilder t=new StringBuilder();t.AppendLine(Status(game,"GAME",game?"Outlast2.exe found":"Outlast2.exe missing"));t.AppendLine(Status(mod,"VR MOD",mod?"dinput8.dll found":"dinput8.dll missing"));t.AppendLine(Status(loader,"OPENXR",loader?"loader found":"openxr_loader.dll missing"));t.AppendLine(Status(ini,"CONFIG",ini?"Beta 1.1 PF18 configuration found":"outlast2_vr_p35.ini missing"));t.AppendLine();t.AppendLine(Status(!String.IsNullOrEmpty(runtime),"RUNTIME",FriendlyRuntime(runtime)));t.AppendLine("  ACTIVE JSON    "+(String.IsNullOrEmpty(runtime)?"Not configured":runtime));t.AppendLine("  SERVICE        "+RuntimeServiceStatus(runtime));t.AppendLine("  HEADSET        Verified when game OpenXR session starts");t.AppendLine("  CONTROLLERS    Verified when game action sets attach");t.AppendLine();t.AppendLine("  ACTIVE BUILD   "+BuildName);t.AppendLine("  GAMEPLAY CORE  PF18 fail-visible compatibility; hybrid tracked arms");t.AppendLine("  RENDERER       "+(Prefs.UseDepthStereo?"Experimental depth stereo":"Compatibility / performance"));diagnosticsText.Text=t.ToString();if(mainRuntime!=null)mainRuntime.Text="OPENXR  //  "+FriendlyRuntime(runtime);
     }
     static string Status(bool good,string name,string value){return(good?"[ OK ] ":"[ !! ] ")+name.PadRight(10)+value;}
     static string RuntimeServiceStatus(string runtime){try{string lower=(runtime??"").ToLowerInvariant();string[] names=lower.Contains("virtualdesktop")?new string[]{"VirtualDesktop.Streamer","VirtualDesktop.Server"}:lower.Contains("steam")?new string[]{"vrserver","vrmonitor"}:new string[]{"OVRServer_x64","OculusClient","vrserver","VirtualDesktop.Streamer"};foreach(string n in names)if(Process.GetProcessesByName(n).Length>0)return"Runtime process detected (session not yet opened)";}catch{}return"Not detected yet; start headset/runtime before Play VR";}
 
-    void LoadPreferences(){Prefs.ReduceFlashes=ReadPreference("ReduceFlashes",false);Prefs.UseSteamVr=ReadPreference("UseSteamVr",false);Prefs.UseSrgb=ReadPreference("UseSrgb",true);Prefs.SafeGraphics=ReadPreference("SafeGraphics",true);}
-    void ApplyPreferencesToControls(){defaultOpenXR.Checked=!Prefs.UseSteamVr;steamOpenXR.Checked=Prefs.UseSteamVr;colorSrgb.Checked=Prefs.UseSrgb;colorLegacy.Checked=!Prefs.UseSrgb;graphicsSafe.Checked=Prefs.SafeGraphics;graphicsKeep.Checked=!Prefs.SafeGraphics;reduceFlashes.Checked=Prefs.ReduceFlashes;}
+    void LoadPreferences(){Prefs.ReduceFlashes=ReadPreference("ReduceFlashes",false);Prefs.UseSteamVr=ReadPreference("UseSteamVr",false);Prefs.UseSrgb=ReadPreference("UseSrgb",true);Prefs.SafeGraphics=ReadPreference("SafeGraphics",true);Prefs.UseDepthStereo=ReadPreference("UseDepthStereo",false);}
+    void ApplyPreferencesToControls(){defaultOpenXR.Checked=!Prefs.UseSteamVr;steamOpenXR.Checked=Prefs.UseSteamVr;colorSrgb.Checked=Prefs.UseSrgb;colorLegacy.Checked=!Prefs.UseSrgb;graphicsSafe.Checked=Prefs.SafeGraphics;graphicsKeep.Checked=!Prefs.SafeGraphics;stereoCompat.Checked=!Prefs.UseDepthStereo;stereoDepth.Checked=Prefs.UseDepthStereo;reduceFlashes.Checked=Prefs.ReduceFlashes;}
     void SavePreferences()
     {
-        if(defaultOpenXR==null)return;Prefs.UseSteamVr=steamOpenXR.Checked;Prefs.UseSrgb=colorSrgb.Checked;Prefs.SafeGraphics=graphicsSafe.Checked;Prefs.ReduceFlashes=reduceFlashes.Checked;
-        try{StringBuilder b=new StringBuilder();b.AppendLine("[Launcher]");b.AppendLine("UseSteamVr="+(Prefs.UseSteamVr?"1":"0"));b.AppendLine("UseSrgb="+(Prefs.UseSrgb?"1":"0"));b.AppendLine("SafeGraphics="+(Prefs.SafeGraphics?"1":"0"));b.AppendLine("ReduceFlashes="+(Prefs.ReduceFlashes?"1":"0"));string temp=preferencesPath+".tmp";File.WriteAllText(temp,b.ToString());if(File.Exists(preferencesPath))File.Replace(temp,preferencesPath,null);else File.Move(temp,preferencesPath);}catch{}
+        if(defaultOpenXR==null)return;Prefs.UseSteamVr=steamOpenXR.Checked;Prefs.UseSrgb=colorSrgb.Checked;Prefs.SafeGraphics=graphicsSafe.Checked;Prefs.UseDepthStereo=stereoDepth.Checked;Prefs.ReduceFlashes=reduceFlashes.Checked;
+        try{StringBuilder b=new StringBuilder();b.AppendLine("[Launcher]");b.AppendLine("UseSteamVr="+(Prefs.UseSteamVr?"1":"0"));b.AppendLine("UseSrgb="+(Prefs.UseSrgb?"1":"0"));b.AppendLine("SafeGraphics="+(Prefs.SafeGraphics?"1":"0"));b.AppendLine("UseDepthStereo="+(Prefs.UseDepthStereo?"1":"0"));b.AppendLine("ReduceFlashes="+(Prefs.ReduceFlashes?"1":"0"));string temp=preferencesPath+".tmp";File.WriteAllText(temp,b.ToString());if(File.Exists(preferencesPath))File.Replace(temp,preferencesPath,null);else File.Move(temp,preferencesPath);}catch{}
     }
     bool ReadPreference(string name,bool fallback){try{if(!File.Exists(preferencesPath))return fallback;foreach(string line in File.ReadAllLines(preferencesPath)){int equal=line.IndexOf('=');if(equal>0&&line.Substring(0,equal).Trim().Equals(name,StringComparison.OrdinalIgnoreCase))return line.Substring(equal+1).Trim()=="1";}}catch{}return fallback;}
 
@@ -377,7 +382,7 @@ public class LauncherForm : Form
     static string GetDefaultRuntime(){string[] keys={@"SOFTWARE\Khronos\OpenXR\1",@"SOFTWARE\WOW6432Node\Khronos\OpenXR\1"};foreach(string n in keys)try{using(RegistryKey k=Registry.LocalMachine.OpenSubKey(n)){string v=k==null?null:k.GetValue("ActiveRuntime")as string;if(!String.IsNullOrWhiteSpace(v))return v;}}catch{}return null;}
     static string FriendlyRuntime(string path){if(String.IsNullOrWhiteSpace(path))return"NOT DETECTED";string l=path.ToLowerInvariant();if(l.Contains("virtualdesktop"))return"VIRTUAL DESKTOP OPENXR";if(l.Contains("steamxr")||l.Contains("steamvr"))return"STEAMVR OPENXR";if(l.Contains("oculus")||l.Contains("meta"))return"META / OCULUS OPENXR";return Path.GetFileName(path).ToUpperInvariant();}
     static string FindSteamVRRuntime(){string[] c={@"C:\Program Files (x86)\Steam\steamapps\common\SteamVR\steamxr_win64.json",@"C:\Program Files\Steam\steamapps\common\SteamVR\steamxr_win64.json"};try{using(RegistryKey k=Registry.CurrentUser.OpenSubKey(@"Software\Valve\Steam")){string steam=k==null?null:k.GetValue("SteamPath")as string;if(!String.IsNullOrWhiteSpace(steam)){string p=Path.Combine(steam,@"steamapps\common\SteamVR\steamxr_win64.json");if(File.Exists(p))return p;}}}catch{}foreach(string p in c)if(File.Exists(p))return p;return null;}
-    static class Prefs{public static bool UseSteamVr,ReduceFlashes;public static bool UseSrgb=true,SafeGraphics=true;}
+    static class Prefs{public static bool UseSteamVr,ReduceFlashes,UseDepthStereo;public static bool UseSrgb=true,SafeGraphics=true;}
 }
 
 public class ControllerDiagram : Control

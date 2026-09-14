@@ -1,4 +1,4 @@
-# Installing Outlast 2 VR Beta 1
+# Installing Outlast 2 VR Beta 1.1 RC1
 
 ## Before installing
 
@@ -9,7 +9,7 @@
 
 ## Recommended manual installation
 
-1. Download `Outlast2VR-Beta1-Windows-x64.zip` from GitHub Releases.
+1. Download `Outlast2VR-Beta1.1-RC1-Windows-x64.zip` from GitHub Releases.
 2. Open the Outlast 2 installation in Steam:
    **Library → Outlast 2 → Manage → Browse local files**.
 3. Open `Binaries`, then `Win64`.
@@ -45,6 +45,9 @@ verifies each installed hash. It never modifies or replaces `Outlast2.exe`.
 - Start at 72 Hz if performance is uncertain, then increase only after testing.
 - Use the launcher's **VR-safe** graphics option to disable motion blur and
   temporal anti-aliasing.
+- Leave **Compatibility / performance** selected for the first test. It is the
+  sharpest and most reliable option. Depth stereo is experimental and costs
+  substantially more GPU performance.
 - Hold both stick clicks in gameplay to open VR settings/recenter controls.
 
 ## Troubleshooting
@@ -53,6 +56,10 @@ verifies each installed hash. It never modifies or replaces `Outlast2.exe`.
   `Outlast2.exe`; move the complete release contents to `Binaries\Win64`.
 - **OpenXR does not start:** select an active OpenXR runtime in Virtual Desktop,
   Meta Quest Link, or SteamVR, then run the launcher's VR check.
+- **Menu appears in VDXR but gameplay remains on the desktop:** keep the launcher
+  on **Default OpenXR / Virtual Desktop** and **Compatibility / performance**.
+  Beta 1.1 includes a full-view gameplay fallback for this transition; attach
+  the log if the fallback still does not appear after several seconds.
 - **Immediate crash:** verify Steam game files, reinstall the complete ZIP, and
   confirm the executable version/hash listed in the README.
 - **Visual or interaction bug:** attach `outlast2_vr_p34.log` from `Binaries\Win64`

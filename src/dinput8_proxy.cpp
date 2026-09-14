@@ -63,7 +63,7 @@
 
 namespace {
 
-constexpr const char* kBuildId = "OUTLAST2VR-NATIVE-VIEW-BED-CULL-PF17-20260910";
+constexpr const char* kBuildId = "OUTLAST2VR-BETA11-COMPAT-PF18-20260914";
 constexpr float kMouseCountsPerRadian = 920.0f;
 constexpr float kMaxAcceptedHeadDeltaRadians = 0.35f;
 

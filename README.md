@@ -2,7 +2,7 @@
   <img src="Outlast2VR_logo.png" alt="Outlast 2 VR" width="520">
 </p>
 
-# Outlast 2 VR — Public Beta 1
+# Outlast 2 VR — Public Beta 1.1 Release Candidate
 
 An unofficial PC VR conversion for Outlast 2 with full headset rendering,
 Quest/Touch controller input, hybrid tracked arms, native character animations,
@@ -15,7 +15,7 @@ camcorder controls, comfortable VR menus, and gamepad-compatible interactions.
 
 ## Download and install
 
-Download `Outlast2VR-Beta1-Windows-x64.zip` from the
+Download `Outlast2VR-Beta1.1-RC1-Windows-x64.zip` from the
 [latest GitHub release](../../releases/latest), then follow [INSTALL.md](INSTALL.md).
 
 The short version: extract the complete ZIP into the folder containing
@@ -32,6 +32,8 @@ Launch `Outlast2VR.exe`, put on the headset, and select **PLAY VR**.
 - OpenXR PC VR rendering and head tracking
 - Comfortable startup, menu, options, and loading-screen presentation
 - Full-view VR gameplay with corrected native camera/culling direction
+- VDXR-safe full-view gameplay fallback when strict scene capture is unavailable
+- Recommended sharp compatibility renderer plus optional experimental depth stereo
 - Hybrid upper-body IK driven by tracked controllers
 - Native Outlast 2 interaction and scripted-scene animations
 - Native camcorder, night vision, zoom, batteries, recordings, and microphone
@@ -75,6 +77,9 @@ verified. Runtime hooks fail closed when executable signatures differ.
 
 ## Beta limitations
 
+- Compatibility/performance mode sends the same sharp gameplay image to both
+  eyes. It is the reliable default but does not provide binocular depth. The
+  optional depth-stereo renderer is more demanding and remains experimental.
 - Some scripted scenes temporarily return arm control to the game's authored
   animation and restore tracking afterward.
 - The game can still display Xbox-style prompts for its original actions.

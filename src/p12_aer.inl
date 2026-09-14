@@ -31,6 +31,8 @@ bool p12LockHeadTranslation = true;
 uint32_t p12NextEye = 0;
 uint64_t p12CapturedCount[2]{};
 uint64_t p12PairSequence=0, p12ActivePair=0;
+uint32_t p12CompatibilityMisses=0;
+bool p12CompatibilityLogged=false;
 float p12UnitsPerMeter = 100.0f;
 bool p15PitchLock=true;
 P22RoomPose p22RoomFrame{};
@@ -538,6 +540,79 @@ bool P12CopySameFrame(XrCompositionLayerProjectionView* out, XrTime displayTime,
     if(valid&&!logged){
         logged=true;
         Log("PB6 CLEAN MONO PATH ACTIVE: one captured gameplay frame copied to both eye slices; one shared native OpenXR pose/FOV; no alternating eye history.");
+    }
+    return valid;
+}
+
+// PF18 fail-visible compatibility path. If the strict renderer/camera match
+// rejects several consecutive gameplay frames, submit the completed native
+// backbuffer as a full-view OpenXR projection. This can never route gameplay
+// through the menu panel and deliberately does not invent stereo disparity.
+bool P12CopyCompatibilityFrame(ID3D11Texture2D* backbuffer,
+    XrCompositionLayerProjectionView* out,XrTime displayTime) {
+    if(!backbuffer||!out||!xrLocateViews||stereoSwapchain==XR_NULL_HANDLE||
+       localSpace==XR_NULL_HANDLE||session==XR_NULL_HANDLE)return false;
+
+    XrView views[2]={{XR_TYPE_VIEW},{XR_TYPE_VIEW}};
+    XrViewState state{XR_TYPE_VIEW_STATE};
+    XrViewLocateInfo locate{XR_TYPE_VIEW_LOCATE_INFO};
+    locate.viewConfigurationType=XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
+    locate.displayTime=displayTime;locate.space=localSpace;
+    uint32_t viewCount=0;
+    const XrResult located=xrLocateViews(session,&locate,&state,2,&viewCount,views);
+    const XrViewStateFlags required=XR_VIEW_STATE_ORIENTATION_VALID_BIT|XR_VIEW_STATE_POSITION_VALID_BIT;
+    if(XR_FAILED(located)||viewCount!=2||(state.viewStateFlags&required)!=required||
+       !P12ValidPose(views[0].pose)||!P12ValidPose(views[1].pose))return false;
+
+    // Use the midpoint pose and the union of both runtime FOVs. Both slices
+    // contain identical pixels, so submitting two different eye poses would
+    // create false geometry and discomfort.
+    XrView shared{XR_TYPE_VIEW};
+    shared.pose=views[0].pose;
+    shared.pose.position.x=(views[0].pose.position.x+views[1].pose.position.x)*0.5f;
+    shared.pose.position.y=(views[0].pose.position.y+views[1].pose.position.y)*0.5f;
+    shared.pose.position.z=(views[0].pose.position.z+views[1].pose.position.z)*0.5f;
+    shared.fov.angleLeft=std::min(views[0].fov.angleLeft,views[1].fov.angleLeft);
+    shared.fov.angleRight=std::max(views[0].fov.angleRight,views[1].fov.angleRight);
+    shared.fov.angleUp=std::max(views[0].fov.angleUp,views[1].fov.angleUp);
+    shared.fov.angleDown=std::min(views[0].fov.angleDown,views[1].fov.angleDown);
+
+    D3D11_TEXTURE2D_DESC source{},destination{};backbuffer->GetDesc(&source);
+    if(stereoImages.empty()||!stereoImages[0].texture)return false;
+    stereoImages[0].texture->GetDesc(&destination);
+    if(source.Width!=destination.Width||source.Height!=destination.Height||
+       !P13CompatibleColorFormat(source.Format,destination.Format)||source.ArraySize!=1||
+       source.MipLevels!=1||destination.ArraySize<2||destination.MipLevels!=1||
+       destination.SampleDesc.Count!=1)return false;
+
+    if(!p12StereoAcquired){
+        XrSwapchainImageAcquireInfo acquire{XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO};
+        if(xrAcquireSwapchainImage(stereoSwapchain,&acquire,&p12AcquiredIndex)!=XR_SUCCESS)return false;
+        p12StereoAcquired=true;
+    }
+    XrSwapchainImageWaitInfo wait{XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO};wait.timeout=XR_INFINITE_DURATION;
+    if(xrWaitSwapchainImage(stereoSwapchain,&wait)!=XR_SUCCESS)return false;
+    bool valid=p12AcquiredIndex<stereoImages.size()&&stereoImages[p12AcquiredIndex].texture;
+    if(valid){
+        for(uint32_t eye=0;eye<2;++eye){
+            const UINT subresource=D3D11CalcSubresource(0,eye,1);
+            if(source.SampleDesc.Count>1)
+                context->ResolveSubresource(stereoImages[p12AcquiredIndex].texture,subresource,backbuffer,0,source.Format);
+            else
+                context->CopySubresourceRegion(stereoImages[p12AcquiredIndex].texture,subresource,0,0,0,backbuffer,0,nullptr);
+            out[eye].pose=shared.pose;out[eye].fov=shared.fov;
+            out[eye].subImage.swapchain=stereoSwapchain;
+            out[eye].subImage.imageRect={{0,0},{static_cast<int32_t>(width),static_cast<int32_t>(height)}};
+            out[eye].subImage.imageArrayIndex=eye;
+        }
+    }
+    XrSwapchainImageReleaseInfo releaseInfo{XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO};
+    const XrResult released=xrReleaseSwapchainImage(stereoSwapchain,&releaseInfo);
+    p12StereoAcquired=false;
+    if(XR_FAILED(released)){failed=true;return false;}
+    if(valid&&!p12CompatibilityLogged){
+        p12CompatibilityLogged=true;
+        Log("PF18 FAIL-VISIBLE GAMEPLAY ACTIVE: strict matched capture timed out; native backbuffer submitted as a full-view OpenXR projection, never a 2D panel.");
     }
     return valid;
 }

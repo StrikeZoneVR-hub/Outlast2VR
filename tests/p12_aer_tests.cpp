@@ -15,6 +15,19 @@ static XrResult XRAPI_PTR Wait(XrSwapchain,const XrSwapchainImageWaitInfo*) {
 static XrResult XRAPI_PTR Release(XrSwapchain,const XrSwapchainImageReleaseInfo*) {
     ++releaseCount; return XR_SUCCESS;
 }
+static XrResult XRAPI_PTR LocateViews(XrSession,const XrViewLocateInfo*,XrViewState* state,
+    uint32_t capacity,uint32_t* count,XrView* views) {
+    *count=2;
+    state->viewStateFlags=XR_VIEW_STATE_ORIENTATION_VALID_BIT|XR_VIEW_STATE_POSITION_VALID_BIT;
+    if(capacity>=2&&views){
+        views[0]={XR_TYPE_VIEW};views[1]={XR_TYPE_VIEW};
+        views[0].pose.orientation.w=views[1].pose.orientation.w=1.0f;
+        views[0].pose.position.x=-0.032f;views[1].pose.position.x=0.032f;
+        views[0].fov={-0.95f,0.82f,0.78f,-0.72f};
+        views[1].fov={-0.82f,0.95f,0.78f,-0.72f};
+    }
+    return XR_SUCCESS;
+}
 static void Check(bool b,const char* why) { if(!b) throw std::runtime_error(why); }
 
 int main() try {
@@ -23,6 +36,9 @@ int main() try {
         D3D11_SDK_VERSION,&bridge.device,nullptr,&bridge.context)),"WARP device");
     bridge.width=8; bridge.height=4; bridge.format=DXGI_FORMAT_R8G8B8A8_UNORM;
     bridge.xrAcquireSwapchainImage=&Acquire; bridge.xrWaitSwapchainImage=&Wait; bridge.xrReleaseSwapchainImage=&Release;
+    bridge.xrLocateViews=&LocateViews;
+    bridge.session=reinterpret_cast<XrSession>(1);bridge.localSpace=reinterpret_cast<XrSpace>(1);
+    bridge.stereoSwapchain=reinterpret_cast<XrSwapchain>(1);
     D3D11_TEXTURE2D_DESC td{};
     td.Width=8; td.Height=4; td.MipLevels=1; td.ArraySize=1;
     td.Format=bridge.format; td.SampleDesc={1,0}; td.Usage=D3D11_USAGE_DEFAULT;
@@ -109,6 +125,18 @@ int main() try {
     bridge.p12HaveCenter=true; bridge.P12Reset(true);
     Check(!bridge.p12HaveCenter && g_p12Constants.params[2]==0,"reset disables native patch and center");
 
+    // PF18 must keep gameplay visible when strict camera matching is rejected.
+    // It copies the current native frame to both eyes as a full projection,
+    // preserving the widest runtime FOV and never using the menu quad.
+    std::array<uint32_t,32> compatibilityPixels;compatibilityPixels.fill(0xFF336699);
+    bridge.context->UpdateSubresource(backbuffer,0,nullptr,compatibilityPixels.data(),8*4,0);
+    const auto compatibilityReleases=releaseCount;
+    Check(bridge.P12CopyCompatibilityFrame(backbuffer,views,20000),"PF18 compatibility gameplay submission");
+    Check(releaseCount==compatibilityReleases+1,"PF18 releases compatibility XR image");
+    checkPixels(0xFF336699,0xFF336699);
+    Check(views[0].pose.position.x==0.0f&&views[1].pose.position.x==0.0f,"PF18 shared midpoint pose");
+    Check(views[0].fov.angleLeft==-0.95f&&views[1].fov.angleRight==0.95f,"PF18 union runtime FOV");
+
     // Exercise the TS1 production shader path with a real typeless D3D11 depth
     // texture. Both eyes must be rendered and the acquired XR image released.
     D3D11_TEXTURE2D_DESC depthDesc{};
@@ -136,6 +164,6 @@ int main() try {
     bridge.ReleaseStereoResources();
     for(auto& image:bridge.stereoImages) image.texture->Release();
     readback->Release(); backbuffer->Release(); bridge.context->Release(); bridge.device->Release();
-    std::puts("PASS: production AER plus TS1 same-frame depth stereo, rotating XR images, poses/FOV, failures, stale frames, rebuild, validation and recenter resets.");
+    std::puts("PASS: production AER, PF18 fail-visible compatibility, TS1 depth stereo, rotating XR images, poses/FOV, failures, stale frames, rebuild, validation and recenter resets.");
     return 0;
 } catch(const std::exception& e) { std::fprintf(stderr,"FAIL: %s\n",e.what()); return 1; }

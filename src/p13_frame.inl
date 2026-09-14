@@ -273,6 +273,24 @@ void P13Submit(IDXGISwapChain* swapchain){
                 }
             }
 
+            // A valid OpenXR session must not go dark merely because a GPU or
+            // driver rejects the strict scene/camera matcher. After a brief
+            // grace period, keep gameplay in a full-view projection using the
+            // completed native frame. Normal matched rendering resumes as soon
+            // as it becomes available again.
+            if(gameplaySubmitted)p12CompatibilityMisses=0;
+            else if(gameplayRequested){
+                p12CompatibilityMisses=std::min(120u,p12CompatibilityMisses+1u);
+                if(p12CompatibilityMisses>=6&&
+                   P12CopyCompatibilityFrame(backbuffer,eyes,p13Frame.predictedDisplayTime)){
+                    projection.space=localSpace;projection.viewCount=2;projection.views=eyes;
+                    layers[count++]=reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);
+                    gameplaySubmitted=true;p46Anchored=false;
+                    std::copy(eyes,eyes+2,p46LastGameplay);
+                    p46LastGameplayTime=p13Frame.predictedDisplayTime;p46LastGameplayValid=true;
+                }
+            }else p12CompatibilityMisses=0;
+
             // Non-gameplay content is rendered onto a world-anchored surface.
             // Once native gameplay begins, never run the world-screen D3D draw
             // again: its context-state swap prevented the known-good Beta

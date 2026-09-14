@@ -9,7 +9,7 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 $buildRoot = [IO.Path]::GetFullPath((Join-Path $repo $BuildDir))
 $outputRoot = [IO.Path]::GetFullPath((Join-Path $repo $OutputDir))
-$packageName = 'Outlast2VR-Beta1-Windows-x64'
+$packageName = 'Outlast2VR-Beta1.1-RC1-Windows-x64'
 $stage = Join-Path $outputRoot $packageName
 $archive = Join-Path $outputRoot ($packageName + '.zip')
 $archiveHashFile = Join-Path $outputRoot ($packageName + '.sha256.txt')
@@ -35,8 +35,8 @@ if ((Get-FileHash -LiteralPath $loader -Algorithm SHA256).Hash -ne $expectedLoad
 }
 
 $dllText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($runtime[0]))
-if (-not $dllText.Contains('OUTLAST2VR-NATIVE-VIEW-BED-CULL-PF17-20260910')) {
-    throw 'dinput8.dll does not contain the expected PF17 build ID.'
+if (-not $dllText.Contains('OUTLAST2VR-BETA11-COMPAT-PF18-20260914')) {
+    throw 'dinput8.dll does not contain the expected PF18 build ID.'
 }
 
 New-Item -ItemType Directory -Path $outputRoot -Force | Out-Null
