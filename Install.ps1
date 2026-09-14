@@ -14,7 +14,7 @@ if (Get-Process -Name Outlast2,Outlast2VR -ErrorAction SilentlyContinue) {
 }
 
 $files = @(
-    'dinput8.dll','openxr_loader.dll','Outlast2VR.exe',
+    'dinput8.dll','openxr_loader.dll','Outlast2VR.exe','Outlast2VR_intro.mp3',
     'outlast2_vr_p32.ini','outlast2_vr_p35.ini','outlast2_vr_p37.ini',
     'INSTALL.md','README.md','RELEASE_NOTES.md','LICENSE','THIRD_PARTY_NOTICES.md',
     'OPENXR_LICENSE.md'

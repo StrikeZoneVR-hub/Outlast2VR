@@ -20,12 +20,15 @@
 - Sharp compatibility/performance renderer is now the default, removing the two
   full-resolution depth reconstruction passes that were enabled by default in
   Beta 1. Experimental depth stereo remains selectable in the launcher.
+- Optional PF19 in-headset startup sequence: “StrikeZone Presents” and
+  “Outlast 2 VR” appear through slow, beat-timed comfort fades before normal
+  startup continues. It can be disabled in launcher Options.
 
 ## Test status
 
 - 19/19 automated regression tests pass.
 - Public headset playtesting completed successfully on the release candidate.
-- Internal runtime ID: `OUTLAST2VR-BETA11-COMPAT-PF18-20260914`.
+- Internal runtime ID: `OUTLAST2VR-BETA11-INTRO-PF19-20260914`.
 
 ## Known beta limitations
 

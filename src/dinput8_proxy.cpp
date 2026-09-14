@@ -25,6 +25,7 @@
 #include <d3d11shader.h>
 #include <dxgi.h>
 #include <wincodec.h>
+#include <mmsystem.h>
 #include <openxr/openxr.h>
 #include <openxr/openxr_platform.h>
 
@@ -63,7 +64,7 @@
 
 namespace {
 
-constexpr const char* kBuildId = "OUTLAST2VR-BETA11-COMPAT-PF18-20260914";
+constexpr const char* kBuildId = "OUTLAST2VR-BETA11-INTRO-PF19-20260914";
 constexpr float kMouseCountsPerRadian = 920.0f;
 constexpr float kMaxAcceptedHeadDeltaRadians = 0.35f;
 
@@ -2920,6 +2921,7 @@ float4 PSMain(VSOut i) : SV_Target {
 
     #include "p19_poses.inl"
     #include "p37_gui.inl"
+    #include "p48_intro.inl"
     #include "p39_ui.inl"
     #include "p18_actions.inl"
 #include "p13_frame.inl"

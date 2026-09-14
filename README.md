@@ -31,6 +31,8 @@ Launch `Outlast2VR.exe`, put on the headset, and select **PLAY VR**.
 
 - OpenXR PC VR rendering and head tracking
 - Comfortable startup, menu, options, and loading-screen presentation
+- Optional seven-second in-headset “StrikeZone Presents / Outlast 2 VR” intro
+  with a calm, beat-timed title reveal
 - Full-view VR gameplay with corrected native camera/culling direction
 - VDXR-safe full-view gameplay fallback when strict scene capture is unavailable
 - Recommended sharp compatibility renderer plus optional experimental depth stereo
@@ -87,6 +89,9 @@ verified. Runtime hooks fail closed when executable signatures differ.
   still exist. Report a repeatable location with the log and a headset capture.
 - This is an intense horror game. Use the launcher comfort options, take breaks,
   and stop immediately if you feel unwell.
+
+The headset intro uses “Game Music: Combat Scene” by AlesiaDavina, available
+under the Pixabay Content License. It can be disabled under launcher Options.
 
 ## Building from source
 

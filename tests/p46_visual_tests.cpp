@@ -120,6 +120,8 @@ int main()try{
     // Simulate the yaw/pitch camera hook handoff; preserve native pitch and
     // carry roll through the renderer, including the scripted fallback.
     OpenXRQuad xr;xr.gameplayVr=xr.sessionRunning=true;xr.p12ConfigLoaded=true;xr.p12SameFrameStereo=1;
+    Check(xr.P48TextWidth("OUTLAST 2",10)==530,"headset intro title centered from deterministic glyph width");
+    Check((xr.P48WithAlpha(0xFFF2F0E9u,0.5f)>>24)==127,"headset intro comfort fade alpha");
     xr.p12LockHeadTranslation=false;xr.p15PitchLock=true;xr.xrLocateViews=Views;xr.xrLocateSpace=Head;
     xr.p12HaveCenter=true;xr.p12Center={{0,0,0,1},{0,0,0}};
     const float pitch=.2f,roll=.1f;

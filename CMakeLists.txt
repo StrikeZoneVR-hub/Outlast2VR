@@ -25,7 +25,7 @@ target_compile_definitions(dinput8 PRIVATE
   NOMINMAX WIN32_LEAN_AND_MEAN DIRECTINPUT_VERSION=0x0800
   XR_USE_PLATFORM_WIN32 XR_USE_GRAPHICS_API_D3D11 XR_NO_PROTOTYPES)
 target_include_directories(dinput8 PRIVATE ${openxr_sdk_SOURCE_DIR}/include)
-target_link_libraries(dinput8 PRIVATE d3d11 d3dcompiler dxgi advapi32 user32 windowscodecs ole32)
+target_link_libraries(dinput8 PRIVATE d3d11 d3dcompiler dxgi advapi32 user32 windowscodecs ole32 winmm)
 set_target_properties(dinput8 PROPERTIES OUTPUT_NAME "dinput8")
 
 enable_testing()
@@ -40,8 +40,11 @@ if(EXISTS "${_csc}")
       /resource:Outlast2VR_launcher_background.png,Outlast2VR.launcher.background.png
       /resource:QuestControllers_CL4.png,Outlast2VR.quest.controllers.png
       Outlast2VR_Launcher.cs VrSettings.cs
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+      "${CMAKE_CURRENT_SOURCE_DIR}/assets/Outlast2VR_intro.mp3"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Outlast2VR_intro.mp3"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    DEPENDS Outlast2VR_Launcher.cs VrSettings.cs Outlast2VR_logo.png Outlast2VR_launcher_background.png QuestControllers_CL4.png VERBATIM)
+    DEPENDS Outlast2VR_Launcher.cs VrSettings.cs Outlast2VR_logo.png Outlast2VR_launcher_background.png QuestControllers_CL4.png assets/Outlast2VR_intro.mp3 VERBATIM)
   add_custom_target(vr_launcher ALL DEPENDS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Outlast2VR.exe")
   add_custom_command(OUTPUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/VrSettingsTests.exe"
     COMMAND "${_csc}" /nologo /target:exe "/out:${_native_bin}\\VrSettingsTests.exe"
@@ -55,7 +58,7 @@ add_executable(p46_visual_tests tests/p46_visual_tests.cpp)
 target_include_directories(p46_visual_tests PRIVATE ${openxr_sdk_SOURCE_DIR}/include)
 target_compile_definitions(p46_visual_tests PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 target_compile_options(p46_visual_tests PRIVATE /EHsc)
-target_link_libraries(p46_visual_tests PRIVATE d3d11 d3dcompiler dxgi advapi32 user32 windowscodecs ole32)
+target_link_libraries(p46_visual_tests PRIVATE d3d11 d3dcompiler dxgi advapi32 user32 windowscodecs ole32 winmm)
 add_test(NAME p46_world_screen_and_visual_regressions COMMAND p46_visual_tests)
 add_executable(p12_projection_tests tests/p12_projection_tests.cpp)
 target_include_directories(p12_projection_tests PRIVATE src)
@@ -68,14 +71,14 @@ add_executable(p12_aer_tests tests/p12_aer_tests.cpp)
 target_compile_definitions(p12_aer_tests PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 target_include_directories(p12_aer_tests PRIVATE ${openxr_sdk_SOURCE_DIR}/include)
 target_compile_options(p12_aer_tests PRIVATE /EHsc)
-target_link_libraries(p12_aer_tests PRIVATE d3d11 dxgi advapi32 user32)
+target_link_libraries(p12_aer_tests PRIVATE d3d11 dxgi advapi32 user32 winmm)
 add_test(NAME p12_aer_history COMMAND p12_aer_tests)
 
 add_executable(p13_ui_tests tests/p13_ui_tests.cpp)
 target_compile_definitions(p13_ui_tests PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 target_include_directories(p13_ui_tests PRIVATE ${openxr_sdk_SOURCE_DIR}/include)
 target_compile_options(p13_ui_tests PRIVATE /EHsc)
-target_link_libraries(p13_ui_tests PRIVATE d3d11 d3dcompiler dxgi advapi32 user32)
+target_link_libraries(p13_ui_tests PRIVATE d3d11 d3dcompiler dxgi advapi32 user32 winmm)
 add_test(NAME p13_ui_and_timing COMMAND p13_ui_tests)
 add_executable(p17_capture_tests tests/p17_capture_tests.cpp)
 target_include_directories(p17_capture_tests PRIVATE src)
@@ -85,19 +88,19 @@ add_executable(p18_input_tests tests/p18_input_tests.cpp)
 target_compile_definitions(p18_input_tests PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 target_include_directories(p18_input_tests PRIVATE ${openxr_sdk_SOURCE_DIR}/include)
 target_compile_options(p18_input_tests PRIVATE /EHsc)
-target_link_libraries(p18_input_tests PRIVATE d3d11 dxgi advapi32 user32)
+target_link_libraries(p18_input_tests PRIVATE d3d11 dxgi advapi32 user32 winmm)
 add_test(NAME p18_quest_input COMMAND p18_input_tests)
 add_executable(p19_rig_tests tests/p19_rig_tests.cpp)
 target_compile_definitions(p19_rig_tests PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 target_include_directories(p19_rig_tests PRIVATE ${openxr_sdk_SOURCE_DIR}/include)
 target_compile_options(p19_rig_tests PRIVATE /EHsc)
-target_link_libraries(p19_rig_tests PRIVATE d3d11 dxgi advapi32 user32)
+target_link_libraries(p19_rig_tests PRIVATE d3d11 dxgi advapi32 user32 winmm)
 add_test(NAME p19_rig_and_poses COMMAND p19_rig_tests)
 add_executable(p20_ik_tests tests/p20_ik_tests.cpp)
 target_compile_definitions(p20_ik_tests PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 target_include_directories(p20_ik_tests PRIVATE ${openxr_sdk_SOURCE_DIR}/include)
 target_compile_options(p20_ik_tests PRIVATE /EHsc)
-target_link_libraries(p20_ik_tests PRIVATE d3d11 dxgi advapi32 user32)
+target_link_libraries(p20_ik_tests PRIVATE d3d11 dxgi advapi32 user32 winmm)
 add_test(NAME p20_body_ik COMMAND p20_ik_tests)
 add_executable(p22_body_anchor_tests tests/p22_body_anchor_tests.cpp)
 target_include_directories(p22_body_anchor_tests PRIVATE src)
@@ -111,7 +114,7 @@ add_executable(p25_holster_tests tests/p25_holster_tests.cpp)
 target_compile_definitions(p25_holster_tests PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 target_include_directories(p25_holster_tests PRIVATE ${openxr_sdk_SOURCE_DIR}/include)
 target_compile_options(p25_holster_tests PRIVATE /EHsc)
-target_link_libraries(p25_holster_tests PRIVATE d3d11 dxgi advapi32 user32)
+target_link_libraries(p25_holster_tests PRIVATE d3d11 dxgi advapi32 user32 winmm)
 add_test(NAME p25_native_holster COMMAND p25_holster_tests)
 
 
@@ -134,7 +137,7 @@ add_executable(p31_capture_tests tests/p31_capture_tests.cpp)
 target_compile_definitions(p31_capture_tests PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 target_include_directories(p31_capture_tests PRIVATE ${openxr_sdk_SOURCE_DIR}/include)
 target_compile_options(p31_capture_tests PRIVATE /EHsc)
-target_link_libraries(p31_capture_tests PRIVATE d3d11 d3dcompiler dxgi advapi32 user32)
+target_link_libraries(p31_capture_tests PRIVATE d3d11 d3dcompiler dxgi advapi32 user32 winmm)
 add_test(NAME p31_lens_pose COMMAND p31_capture_tests)
 
 

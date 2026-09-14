@@ -18,6 +18,7 @@
    - `dinput8.dll`
    - `openxr_loader.dll`
    - `Outlast2VR.exe`
+   - `Outlast2VR_intro.mp3`
    - `outlast2_vr_p32.ini`
    - `outlast2_vr_p35.ini`
    - `outlast2_vr_p37.ini`
@@ -49,6 +50,8 @@ verifies each installed hash. It never modifies or replaces `Outlast2.exe`.
   sharpest and most reliable option. Depth stereo is experimental and costs
   substantially more GPU performance.
 - Hold both stick clicks in gameplay to open VR settings/recenter controls.
+- The short StrikeZone VR headset intro is enabled by default. Uncheck
+  **Play StrikeZone VR headset intro** on the launch page to start immediately.
 
 ## Troubleshooting
 

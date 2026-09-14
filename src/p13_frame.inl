@@ -342,6 +342,14 @@ void P13Submit(IDXGISwapChain* swapchain){
                 P37GuiQuad(gui);
                 layers[count++]=reinterpret_cast<const XrCompositionLayerBaseHeader*>(&gui);
             }
+
+            // PF19 is an optional, short VIEW-space title card. It overlays
+            // startup only and never replaces or re-routes game/menu layers.
+            if(count<4&&P48RenderIntro()){
+                static XrCompositionLayerQuad intro{XR_TYPE_COMPOSITION_LAYER_QUAD};
+                P48IntroQuad(intro);
+                layers[count++]=reinterpret_cast<const XrCompositionLayerBaseHeader*>(&intro);
+            }
         }
 
         XrFrameEndInfo end{XR_TYPE_FRAME_END_INFO};

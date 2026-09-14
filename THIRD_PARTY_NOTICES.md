@@ -17,3 +17,9 @@ The vendored OpenXR headers and the loader distributed with binary releases are
 copyright The Khronos Group Inc. They are available under the SPDX expression
 `Apache-2.0 OR MIT`. This project elects the MIT option for redistribution.
 See <https://github.com/KhronosGroup/OpenXR-SDK/blob/main/COPYING.adoc>.
+
+## Startup music
+
+“Game Music: Combat Scene” by AlesiaDavina is used for the optional headset
+intro. The track is offered for free use under the Pixabay Content License:
+<https://pixabay.com/music/action-game-music-combat-scene-209409/>.

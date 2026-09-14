@@ -16,7 +16,8 @@ $archiveHashFile = Join-Path $outputRoot ($packageName + '.sha256.txt')
 
 $runtime = @(
     (Join-Path $buildRoot 'bin\dinput8.dll'),
-    (Join-Path $buildRoot 'bin\Outlast2VR.exe')
+    (Join-Path $buildRoot 'bin\Outlast2VR.exe'),
+    (Join-Path $buildRoot 'bin\Outlast2VR_intro.mp3')
 )
 if (-not (Test-Path -LiteralPath $runtime[0])) {
     $runtime[0] = Join-Path $buildRoot 'bin\RelWithDebInfo\dinput8.dll'
@@ -35,8 +36,8 @@ if ((Get-FileHash -LiteralPath $loader -Algorithm SHA256).Hash -ne $expectedLoad
 }
 
 $dllText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($runtime[0]))
-if (-not $dllText.Contains('OUTLAST2VR-BETA11-COMPAT-PF18-20260914')) {
-    throw 'dinput8.dll does not contain the expected PF18 build ID.'
+if (-not $dllText.Contains('OUTLAST2VR-BETA11-INTRO-PF19-20260914')) {
+    throw 'dinput8.dll does not contain the expected PF19 build ID.'
 }
 
 New-Item -ItemType Directory -Path $outputRoot -Force | Out-Null
@@ -55,6 +56,7 @@ New-Item -ItemType Directory -Path $stage | Out-Null
 $copies = @{
     $runtime[0] = 'dinput8.dll'
     $runtime[1] = 'Outlast2VR.exe'
+    $runtime[2] = 'Outlast2VR_intro.mp3'
     $loader = 'openxr_loader.dll'
 }
 foreach ($entry in $copies.GetEnumerator()) {
