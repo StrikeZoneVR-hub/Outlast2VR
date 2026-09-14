@@ -1,4 +1,4 @@
-# Installing Outlast 2 VR Beta 1.1 RC1
+# Installing Outlast 2 VR Public Beta 1.1
 
 ## Before installing
 
@@ -9,7 +9,7 @@
 
 ## Recommended manual installation
 
-1. Download `Outlast2VR-Beta1.1-RC1-Windows-x64.zip` from GitHub Releases.
+1. Download `Outlast2VR-Beta1.1-Windows-x64.zip` from GitHub Releases.
 2. Open the Outlast 2 installation in Steam:
    **Library → Outlast 2 → Manage → Browse local files**.
 3. Open `Binaries`, then `Win64`.

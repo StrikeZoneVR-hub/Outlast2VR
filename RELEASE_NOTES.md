@@ -1,4 +1,4 @@
-# Public Beta 1.1 RC1 release notes
+# Public Beta 1.1 release notes
 
 ## Included
 
@@ -22,7 +22,30 @@
   Beta 1. Experimental depth stereo remains selectable in the launcher.
 - Optional PF19 in-headset startup sequence: “StrikeZone Presents” and
   “Outlast 2 VR” appear through slow, beat-timed comfort fades before normal
-  startup continues. It can be disabled in launcher Options.
+  startup continues. It can be disabled directly on the launch page.
+
+## Performance improvements in 1.1
+
+- **Compatibility / performance is now the default renderer.** Beta 1 started
+  with experimental depth stereo, which reconstructed both eyes with two
+  additional full-resolution shader passes every frame. The new default makes
+  one exact copy of the completed gameplay frame to both eyes, reducing GPU
+  work and producing a sharper image on systems that previously reported
+  30–40 FPS and blur.
+- **Experimental depth stereo is opt-in.** It remains available in launcher
+  Options for powerful GPUs and comparison testing, but no longer lowers the
+  out-of-box performance of the public build.
+- **The expensive persistent-object culling scan remains disabled.** That scan
+  could cause a severe startup hitch lasting several minutes. The lighter
+  hardware-occlusion correction stays enabled for gameplay visibility.
+- **VDXR gameplay now fails visible.** If strict camera/capture matching is not
+  accepted by a particular GPU or driver, the mod switches to a direct
+  full-view OpenXR gameplay submission instead of leaving gameplay visible
+  only on the desktop.
+- **VR-safe graphics remain recommended.** This disables motion blur, temporal
+  anti-aliasing and other effects that are expensive or unstable in this VR
+  renderer. Start at 72 Hz and raise headset refresh only after performance is
+  stable.
 
 ## Test status
 

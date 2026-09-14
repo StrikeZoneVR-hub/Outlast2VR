@@ -43,6 +43,6 @@ foreach ($file in $files) {
     if ($sourceHash -ne $targetHash) { throw "Installed hash did not match: $file" }
 }
 
-Write-Output "Outlast 2 VR Beta 1.1 RC1 installed to: $gamePath"
+Write-Output "Outlast 2 VR Public Beta 1.1 installed to: $gamePath"
 Write-Output "Previous mod files backed up to: $backup"
 Write-Output 'Launch Outlast2VR.exe and choose PLAY VR.'

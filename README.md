@@ -2,7 +2,7 @@
   <img src="Outlast2VR_logo.png" alt="Outlast 2 VR" width="520">
 </p>
 
-# Outlast 2 VR — Public Beta 1.1 Release Candidate
+# Outlast 2 VR — Public Beta 1.1
 
 An unofficial PC VR conversion for Outlast 2 with full headset rendering,
 Quest/Touch controller input, hybrid tracked arms, native character animations,
@@ -15,7 +15,7 @@ camcorder controls, comfortable VR menus, and gamepad-compatible interactions.
 
 ## Download and install
 
-Download `Outlast2VR-Beta1.1-RC1-Windows-x64.zip` from the
+Download `Outlast2VR-Beta1.1-Windows-x64.zip` from the
 [latest GitHub release](../../releases/latest), then follow [INSTALL.md](INSTALL.md).
 
 The short version: extract the complete ZIP into the folder containing
@@ -76,6 +76,16 @@ Launch `Outlast2VR.exe`, put on the headset, and select **PLAY VR**.
 
 Other OpenXR headsets and game revisions may work but are not yet considered
 verified. Runtime hooks fail closed when executable signatures differ.
+
+## Recommended performance setup
+
+- Select **Compatibility / performance** in the launcher. It avoids the two
+  extra full-resolution depth-stereo shader passes used by Beta 1.
+- Select **VR-safe** graphics to disable motion blur and temporal AA.
+- Quest/Virtual Desktop users should begin at 72 Hz and increase refresh rate
+  only after confirming stable headroom.
+- Leave `PrimitiveDrawDistanceFix=0`; enabling its diagnostic object scan can
+  produce a long startup hitch.
 
 ## Beta limitations
 

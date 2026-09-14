@@ -36,7 +36,7 @@ enum LauncherPage { Launch, Controls, Diagnostics, Options }
 public class LauncherForm : Form
 {
     const string MusicAlias = "Outlast2VRMenuMusic";
-    const string BuildName = "BETA 1.1 RC1  •  PF19 HEADSET INTRO";
+    const string BuildName = "PUBLIC BETA 1.1  •  PF19 HEADSET INTRO";
     readonly string gameDir, exePath, preferencesPath;
     readonly bool previewMode;
     readonly Random random = new Random();

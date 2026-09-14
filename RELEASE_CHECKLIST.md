@@ -2,7 +2,7 @@
 
 - [ ] Confirm the repository contains no Outlast 2 game files or extracted assets.
 - [ ] Run `BUILD.cmd` and confirm all 19 tests pass.
-- [ ] Verify launcher diagnostics show **Beta 1.1 RC1 / PF19**.
+- [ ] Verify launcher diagnostics show **Public Beta 1.1 / PF19**.
 - [ ] Test the headset intro enabled and disabled, including its audio fade and
       automatic return to the normal startup/menu presentation.
 - [ ] Test startup, menus, options, loading, new game, and continued save.
